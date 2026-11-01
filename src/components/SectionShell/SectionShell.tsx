@@ -21,7 +21,7 @@ export function SectionShell({ id, eyebrow, title, children }: SectionShellProps
     <section
       id={id}
       aria-labelledby={`${id}-title`}
-      className="min-h-screen scroll-mt-20 px-6 py-24"
+      className="min-h-screen scroll-mt-20 px-6 py-14"
     >
       <div className="mx-auto max-w-5xl">
         {eyebrow && (
@@ -32,7 +32,7 @@ export function SectionShell({ id, eyebrow, title, children }: SectionShellProps
         <h2 id={`${id}-title`} className="mt-2 text-4xl font-bold">
           {title}
         </h2>
-        <div className="mt-8">{children}</div>
+        <div className="mt-6">{children}</div>
       </div>
     </section>
   )
