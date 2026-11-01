@@ -21,7 +21,7 @@ export function SectionShell({ id, eyebrow, title, children }: SectionShellProps
     <section
       id={id}
       aria-labelledby={`${id}-title`}
-      className="min-h-screen scroll-mt-20 px-6 py-14"
+      className="px-6 py-14"
     >
       <div className="mx-auto max-w-5xl">
         {eyebrow && (

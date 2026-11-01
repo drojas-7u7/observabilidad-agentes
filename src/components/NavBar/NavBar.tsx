@@ -1,14 +1,14 @@
 import { sections } from '../../config/sections'
-import { useActiveSection } from '../../hooks/useActiveSection'
-import { useScrollProgress } from '../../hooks/useScrollProgress'
 
-// Se calcula una sola vez, fuera del componente, para no repetirlo en cada dibujado.
-const sectionIds = sections.map((section) => section.id)
+interface NavBarProps {
+  /** Sección que se está mostrando. */
+  activeId: string
+}
 
 /** Menú de navegación fijo, generado a partir de la lista de secciones. */
-export function NavBar() {
-  const activeId = useActiveSection(sectionIds)
-  const progress = useScrollProgress()
+export function NavBar({ activeId }: NavBarProps) {
+  const activeIndex = sections.findIndex((section) => section.id === activeId)
+  const progress = (activeIndex + 1) / sections.length
 
   return (
     <header className="sticky top-0 z-50 border-b-2 border-ink bg-background/95 backdrop-blur">
@@ -17,20 +17,22 @@ export function NavBar() {
         className="mx-auto flex max-w-6xl items-center gap-6 px-6 py-3"
       >
         <a
-          href="#introduccion"
+          href={`#${sections[0].id}`}
           className="hidden shrink-0 font-heading text-lg font-bold sm:block"
         >
           Detectives de agentes
         </a>
 
         <ul className="flex gap-1 overflow-x-auto">
-          {sections.map(({ id, navLabel }) => {
+          {sections
+            .filter((section) => !section.hideInNav)
+            .map(({ id, navLabel }) => {
             const isActive = id === activeId
             return (
               <li key={id}>
                 <a
                   href={`#${id}`}
-                  aria-current={isActive ? 'location' : undefined}
+                  aria-current={isActive ? 'page' : undefined}
                   className={`block whitespace-nowrap rounded-full px-3 py-1 text-sm font-semibold transition-colors ${
                     isActive ? 'bg-primary text-white' : 'hover:bg-surface'
                   }`}
@@ -43,10 +45,10 @@ export function NavBar() {
         </ul>
       </nav>
 
-      {/* Barra de progreso de lectura */}
+      {/* Progreso en la clase: qué parte de todas las secciones llevamos */}
       <div className="h-1 bg-surface" aria-hidden="true">
         <div
-          className="h-full origin-left bg-accent"
+          className="h-full origin-left bg-accent transition-transform duration-500"
           style={{ transform: `scaleX(${progress})` }}
         />
       </div>

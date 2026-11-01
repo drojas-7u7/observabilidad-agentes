@@ -1,6 +1,7 @@
 import type { ComponentType } from 'react'
 import type { SectionProps } from '../types/section'
 
+import { CoverSection } from '../sections/Cover/CoverSection'
 import { IntroSection } from '../sections/Intro/IntroSection'
 import { CaseSection } from '../sections/Case/CaseSection'
 import { HistorySection } from '../sections/History/HistorySection'
@@ -12,12 +13,14 @@ import { ResourcesSection } from '../sections/Resources/ResourcesSection'
 
 /** Datos de cada sección registrada en la web. */
 export interface SectionConfig {
-  /** Identificador único. Aparece en la dirección al navegar (por ejemplo, #el-caso). */
+  /** Identificador único. Aparece en la dirección (por ejemplo, #el-caso). */
   id: string
-  /** Nombre corto que se muestra en el menú de navegación. */
+  /** Nombre corto para el menú y los botones de navegación. */
   navLabel: string
   /** Componente que dibuja la sección. */
   component: ComponentType<SectionProps>
+  /** Si es true, no aparece como botón en el menú (sí en la navegación). */
+  hideInNav?: boolean
 }
 
 /**
@@ -27,9 +30,11 @@ export interface SectionConfig {
  * - Para quitar una sección: borra (o comenta) su línea.
  * - Para añadir una: crea su componente en src/sections e inclúyelo aquí.
  *
- * El menú de navegación y el índice se generan a partir de esta lista.
+ * El menú, los botones de navegación y la barra de progreso
+ * se generan a partir de esta lista.
  */
 export const sections: SectionConfig[] = [
+  { id: 'portada', navLabel: 'Portada', component: CoverSection, hideInNav: true },
   { id: 'introduccion', navLabel: 'Introducción', component: IntroSection },
   { id: 'el-caso', navLabel: 'El caso', component: CaseSection },
   { id: 'historia', navLabel: 'Historia', component: HistorySection },
@@ -39,3 +44,6 @@ export const sections: SectionConfig[] = [
   { id: 'cierre', navLabel: 'Cierre', component: ClosingSection },
   { id: 'recursos', navLabel: 'Recursos', component: ResourcesSection },
 ]
+
+/** Identificadores de todas las secciones, en orden. */
+export const sectionIds = sections.map((section) => section.id)
