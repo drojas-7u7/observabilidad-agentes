@@ -1,4 +1,31 @@
+import { catalinaTrace } from '../data/traces/catalina'
 import type { Question } from '../types/question'
+
+/**
+ * Textos de la parte 2.
+ * Los mensajes del chat se toman de la traza de Catalina,
+ * para que el chat y la traza digan siempre lo mismo.
+ */
+export const caseContent = {
+  title: 'El caso del vuelo de 95 €',
+  fileNumber: 'Expediente nº 001',
+  fileName: 'El vuelo de 95 euros',
+  status: 'Abierto',
+  clientName: catalinaTrace.client,
+  clientMessage: catalinaTrace.request,
+  agentName: 'Agente de viajes',
+  agentMessage: catalinaTrace.finalAnswer,
+  typingLabel: 'El agente está escribiendo',
+  notification: {
+    source: 'Banca Nube · notificación ficticia',
+    title: 'Cargo en tu tarjeta',
+    amount: '95,00 €',
+    detail: 'AeroBrisa · Reserva M3X8RT',
+  },
+  twist: '¿Qué ha pasado aquí?',
+  /** Texto del botón en cada momento de la secuencia. */
+  stepButtons: ['Ver la respuesta del agente', 'Ver qué pasó después', 'Investigar'],
+}
 
 /** Pregunta de la parte 2: ¿cómo averiguarías qué ha pasado con Catalina? */
 export const caseQuestion: Question = {
