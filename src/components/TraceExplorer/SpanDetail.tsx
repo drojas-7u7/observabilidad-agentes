@@ -80,7 +80,7 @@ function SpanDetailContent({ span }: { span: Span }) {
       <pre
         role="tabpanel"
         aria-label={activeTab.label}
-        className="mt-3 max-h-80 min-h-40 flex-1 overflow-auto rounded-lg bg-ink p-3 font-mono text-sm leading-relaxed text-background lg:max-h-none lg:basis-0"
+        className="mt-3 max-h-80 min-h-40 flex-1 overflow-auto rounded-lg bg-ink p-3 font-mono text-sm leading-relaxed whitespace-pre-wrap break-words text-background lg:max-h-none lg:basis-0"
       >
         {JSON.stringify(activeTab.value, null, 2)}
       </pre>
