@@ -6,7 +6,7 @@ import { SectionShell } from '../../components/SectionShell/SectionShell'
 import { caseContent, caseQuestion } from '../../content/case'
 import type { SectionProps } from '../../types/section'
 import { ChargeNotification } from './ChargeNotification'
-import { ChatMessage, TypingIndicator } from './ChatMessage'
+import { ChatMessage, TypingIndicator } from '../../components/ChatMessage/ChatMessage'
 
 /** Número de momentos de la secuencia antes de la pregunta. */
 const LAST_STEP = caseContent.stepButtons.length

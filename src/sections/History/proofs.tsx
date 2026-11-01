@@ -1,8 +1,7 @@
 import { Bita } from '../../components/Bita/Bita'
-import { KIND_LABELS } from '../../components/TraceExplorer/spanMeta'
+import { TraceOutline } from '../../components/TraceExplorer/TraceOutline'
 import { proofs } from '../../content/history'
 import { catalinaTrace } from '../../data/traces/catalina'
-import { flattenSpanTree } from '../../lib/traceTree'
 
 /** Época 1: una ficha de papel. */
 export function PaperProof() {
@@ -47,10 +46,7 @@ export function ServicesProof() {
     <div>
       <div className="grid gap-3 sm:grid-cols-3">
         {items.map((item) => (
-          <div
-            key={item.name}
-            className="rounded-xl border-2 border-ink bg-white p-3 text-center"
-          >
+          <div key={item.name} className="rounded-xl border-2 border-ink bg-white p-3 text-center">
             <p className="font-heading font-bold">{item.name}</p>
             <p className="mt-1 font-mono text-xs">{item.log}</p>
           </div>
@@ -65,24 +61,11 @@ export function ServicesProof() {
 
 /** Época 4: adelanto del árbol de la traza de Catalina (generado de la traza real). */
 export function AgentProof() {
-  const nodes = flattenSpanTree(catalinaTrace.spans)
   return (
     <div className="flex flex-col items-start gap-4 sm:flex-row sm:items-end">
-      <ul className="flex-1 space-y-1 rounded-xl border-2 border-ink bg-white p-3">
-        {nodes.map(({ span, depth, isLastChild }) => (
-          <li key={span.id} className="flex items-center gap-2 text-sm">
-            {depth > 0 && (
-              <span className="font-mono text-ink/40" aria-hidden="true">
-                {isLastChild ? '└─' : '├─'}
-              </span>
-            )}
-            <span className="w-24 shrink-0 rounded-md bg-ink/10 py-0.5 text-center font-mono text-xs">
-              {KIND_LABELS[span.kind]}
-            </span>
-            <span className="truncate">{span.label}</span>
-          </li>
-        ))}
-      </ul>
+      <div className="flex-1">
+        <TraceOutline trace={catalinaTrace} />
+      </div>
       <Bita pose="investigating" message={proofs.agent.note} bubbleSide="top" size="sm" />
     </div>
   )
