@@ -1,0 +1,24 @@
+/*
+  Tema visual del proyecto.
+  Todos los colores y tipografías de la web se definen aquí.
+  Para cambiar el diseño, basta con modificar estos valores.
+*/
+
+@theme {
+  /* Colores base, sacados del diseño de Bita */
+  --color-background: #fff8ec; /* Fondo: crema tipo papel */
+  --color-surface: #e8c48a;    /* Fondos de tarjetas: arena del pelaje */
+  --color-ink: #1e2a4a;        /* Texto principal: azul marino de la gorra */
+  --color-primary: #2e5aa8;    /* Color principal: azul de la gabardina */
+  --color-accent: #d9a53b;     /* Acento: dorado de la lupa */
+
+  /* Colores con significado (estados de los spans) */
+  --color-success: #3a9d5d;    /* Correcto */
+  --color-warning: #e89b2c;    /* Aviso */
+  --color-danger: #c8323a;     /* Error o hallazgo: rojo del pañuelo */
+
+  /* Tipografías */
+  --font-heading: "Baloo 2 Variable", system-ui, sans-serif;
+  --font-body: "Nunito Variable", system-ui, sans-serif;
+  --font-mono: "JetBrains Mono Variable", ui-monospace, monospace;
+}
