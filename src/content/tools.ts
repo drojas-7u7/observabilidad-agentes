@@ -82,7 +82,7 @@ export type ClueId = 'logs' | 'metrics' | 'trace'
 
 /** Momento 3: las tres pistas. */
 export const cluesMoment = {
-  idea: 'Un agente instrumentado deja tres tipos de pistas, y cada una responde a una pregunta distinta. Veámoslas con la reserva de Charo: otra clienta que usó el mismo agente que Catalina y a la que todo le salió bien.',
+  idea: 'Un agente instrumentado deja tres tipos de pistas, y cada una responde a una pregunta distinta. Vamos a verlas con la reserva de Charo.',
   instruction: 'Pulsa cada pista para descubrirla.',
   revealLabel: 'Descubrir la pista',
   order: ['logs', 'metrics', 'trace'] satisfies ClueId[],
@@ -150,4 +150,13 @@ export const traceMoment = {
       },
     ],
   },
+}
+
+/** Presentación de Charo, la primera vez que aparece (momento 3). */
+export const charoIntro = {
+  title: 'Antes de seguir: conoce a Charo',
+  text: 'Charo es otra clienta. Esa misma semana pidió un vuelo al mismo agente que atendió a Catalina, y a ella todo le salió bien:',
+  agentName: 'Agente de viajes',
+  whyTitle: 'Por qué la usamos',
+  why: 'Para aprender a leer las pistas con un caso que funcionó. Así sabremos qué es lo normal, y luego podremos detectar lo que no lo es en el caso de Catalina.',
 }

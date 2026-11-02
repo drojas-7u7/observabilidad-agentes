@@ -2,6 +2,7 @@ import { motion } from 'motion/react'
 import type { ReactNode } from 'react'
 import { usePersistentState } from '../../hooks/usePersistentState'
 import { RealWorld } from '../../components/RealWorld/RealWorld'
+import { CharoIntro } from './CharoIntro'
 import { TraceOutline } from '../../components/TraceExplorer/TraceOutline'
 import { cluesMoment, type ClueId } from '../../content/tools'
 import { charoTrace } from '../../data/traces/charo'
@@ -94,7 +95,8 @@ export function CluesMoment() {
 
   return (
     <div>
-      <p className="max-w-3xl text-lg">{cluesMoment.idea}</p>
+      <CharoIntro />
+      <p className="mt-8 max-w-3xl text-lg">{cluesMoment.idea}</p>
       <p className="mt-2 text-sm font-semibold text-ink/70">{cluesMoment.instruction}</p>
 
       <div className="mt-5 grid items-start gap-5 md:grid-cols-3">
