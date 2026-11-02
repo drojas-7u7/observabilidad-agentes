@@ -1,6 +1,6 @@
 /*
   Tema visual del proyecto.
-  Todos los colores y tipografías de la web se definen aquí.
+  Todos los colores, tipografías y animaciones de la web se definen aquí.
   Para cambiar el diseño, basta con modificar estos valores.
 */
 
@@ -21,4 +21,46 @@
   --font-heading: "Baloo 2 Variable", system-ui, sans-serif;
   --font-body: "Nunito Variable", system-ui, sans-serif;
   --font-mono: "JetBrains Mono Variable", ui-monospace, monospace;
+
+  /* Animaciones */
+  --animate-float: float 3s linear infinite; /* Flotación suave de Bita */
+
+  /*
+    Flotación con forma de onda: cada punto es la posición que tendría
+    un objeto flotando en el agua. Recorrida a velocidad constante (linear),
+    el movimiento es continuo y sin pausas en los extremos.
+  */
+  @keyframes float {
+    0%,
+    100% {
+      transform: translate3d(0, 0, 0) rotate(0.02deg);
+    }
+    10% {
+      transform: translate3d(0, -0.76px, 0) rotate(0.02deg);
+    }
+    20% {
+      transform: translate3d(0, -2.76px, 0) rotate(0.02deg);
+    }
+    30% {
+      transform: translate3d(0, -5.24px, 0) rotate(0.02deg);
+    }
+    40% {
+      transform: translate3d(0, -7.24px, 0) rotate(0.02deg);
+    }
+    50% {
+      transform: translate3d(0, -8px, 0) rotate(0.02deg);
+    }
+    60% {
+      transform: translate3d(0, -7.24px, 0) rotate(0.02deg);
+    }
+    70% {
+      transform: translate3d(0, -5.24px, 0) rotate(0.02deg);
+    }
+    80% {
+      transform: translate3d(0, -2.76px, 0) rotate(0.02deg);
+    }
+    90% {
+      transform: translate3d(0, -0.76px, 0) rotate(0.02deg);
+    }
+  }
 }

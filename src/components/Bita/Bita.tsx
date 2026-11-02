@@ -73,7 +73,15 @@ export function Bita({
     <div className={`flex gap-4 ${layout} ${className}`}>
       {bubbleSide !== 'right' && <div aria-live="polite">{bubble}</div>}
 
-      <div className={`${SIZE_CLASSES[size]} shrink-0`}>
+      {/*
+        Capa exterior: flota con una animación de CSS (la ejecuta la tarjeta
+        gráfica, así no se atasca). motion-safe: solo si no se han pedido
+        animaciones reducidas.
+      */}
+      <div
+        className={`${SIZE_CLASSES[size]} shrink-0 will-change-transform motion-safe:animate-float`}
+      >
+        {/* Capa interior: transición suave al cambiar de pose */}
         <AnimatePresence mode="wait" initial={false}>
           <motion.img
             key={pose}
@@ -82,14 +90,9 @@ export function Bita({
             decoding="async"
             className="h-full w-auto"
             initial={{ opacity: 0, scale: 0.92 }}
-            animate={{ opacity: 1, scale: 1, y: [0, -6, 0] }}
-            exit={{ opacity: 0, scale: 0.92, transition: { duration: 0.15 } }}
-            transition={{
-              opacity: { duration: 0.2 },
-              scale: { duration: 0.2 },
-              // Flotación suave y continua en reposo
-              y: { duration: 3, repeat: Infinity, ease: 'easeInOut' },
-            }}
+            animate={{ opacity: 1, scale: 1 }}
+            exit={{ opacity: 0, scale: 0.92 }}
+            transition={{ duration: 0.2 }}
           />
         </AnimatePresence>
       </div>
