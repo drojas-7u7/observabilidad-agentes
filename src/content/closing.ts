@@ -100,7 +100,7 @@ export const evaluateMoment = {
   realWorld: {
     text: 'Herramientas como LangSmith o Langfuse permiten guardar golden sets (los llaman datasets), ejecutar el agente contra ellos, usar jueces automáticos y comparar los resultados entre versiones.',
     links: [
-      { label: 'LangSmith', href: 'https://docs.smith.langchain.com/' },
+      { label: 'LangSmith', href: 'https://docs.langchain.com/langsmith' },
       { label: 'Langfuse', href: 'https://langfuse.com/docs' },
     ],
   },

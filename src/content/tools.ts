@@ -71,7 +71,7 @@ export const instrumentMoment = {
   realWorld: {
     text: 'En la práctica suele ser muy poco código. En un agente hecho con LangGraph, basta con configurar un par de variables de entorno para que todo empiece a registrarse en LangSmith. Con OpenTelemetry, se añade una librería al proyecto.',
     links: [
-      { label: 'LangSmith', href: 'https://docs.smith.langchain.com/' },
+      { label: 'LangSmith', href: 'https://docs.langchain.com/langsmith' },
       { label: 'OpenTelemetry', href: 'https://opentelemetry.io/docs/' },
     ],
   },
@@ -142,7 +142,7 @@ export const traceMoment = {
   realWorld: {
     text: 'Herramientas como LangSmith, Langfuse o Arize Phoenix muestran este mismo árbol para cada ejecución de un agente, con sus tiempos, tokens y datos. Lo que acabas de ver es una versión simplificada de lo que se usa en la industria.',
     links: [
-      { label: 'LangSmith', href: 'https://docs.smith.langchain.com/' },
+      { label: 'LangSmith', href: 'https://docs.langchain.com/langsmith' },
       { label: 'Langfuse', href: 'https://langfuse.com/docs' },
       {
         label: 'OpenTelemetry para IA generativa',
