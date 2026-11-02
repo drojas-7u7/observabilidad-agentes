@@ -82,7 +82,7 @@ export type ClueId = 'logs' | 'metrics' | 'trace'
 
 /** Momento 3: las tres pistas. */
 export const cluesMoment = {
-  idea: 'Un agente instrumentado deja tres tipos de pistas. Cada una responde a una pregunta distinta.',
+  idea: 'Un agente instrumentado deja tres tipos de pistas, y cada una responde a una pregunta distinta. Veámoslas con la reserva de Charo: otra clienta que usó el mismo agente que Catalina y a la que todo le salió bien.',
   instruction: 'Pulsa cada pista para descubrirla.',
   revealLabel: 'Descubrir la pista',
   order: ['logs', 'metrics', 'trace'] satisfies ClueId[],
@@ -134,6 +134,8 @@ export const traceMoment = {
       text: 'El estado técnico de cada paso: verde (correcto), ámbar (aviso) o rojo (error).',
     },
   ],
+  explorerDescription:
+    'Charo reservó un vuelo Madrid–Sevilla con el mismo agente que Catalina. Su reserva salió bien.',
   bita: 'Prueba: pulsa en «Reserva el vuelo» y mira lo que devolvió. ¿Cuál fue el precio final?',
   standard:
     'Los nombres técnicos (gen_ai.request.model, gen_ai.usage.input_tokens...) siguen el estándar OpenTelemetry: un idioma común que entienden todas las herramientas de observabilidad.',

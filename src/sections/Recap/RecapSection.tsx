@@ -21,6 +21,7 @@ export function RecapSection({ id }: SectionProps) {
           <li key={card.id}>
             <FlipCard
               highlight={card.highlight}
+              storageKey={`masterclass:repaso:${card.id}`}
               front={
                 <>
                   <span className="font-mono text-xs uppercase tracking-wider">

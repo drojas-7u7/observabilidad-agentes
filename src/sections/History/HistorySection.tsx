@@ -1,5 +1,6 @@
 import { AnimatePresence, motion } from 'motion/react'
-import { useState, type ComponentType } from 'react'
+import type { ComponentType } from 'react'
+import { usePersistentState } from '../../hooks/usePersistentState'
 import { Bita } from '../../components/Bita/Bita'
 import { SectionShell } from '../../components/SectionShell/SectionShell'
 import { eras, historyContent, type ProofKind } from '../../content/history'
@@ -16,8 +17,8 @@ const PROOF_COMPONENTS: Record<ProofKind, ComponentType> = {
 
 /** Parte 3: el mismo caso investigado en cuatro épocas. */
 export function HistorySection({ id }: SectionProps) {
-  const [activeEraId, setActiveEraId] = useState(eras[0].id)
-  const [visitedIds, setVisitedIds] = useState<string[]>([eras[0].id])
+  const [activeEraId, setActiveEraId] = usePersistentState('masterclass:historia:epoca', eras[0].id)
+  const [visitedIds, setVisitedIds] = usePersistentState<string[]>('masterclass:historia:vistas', [eras[0].id])
 
   const activeEra = eras.find((era) => era.id === activeEraId) ?? eras[0]
   const Proof = PROOF_COMPONENTS[activeEra.proof]

@@ -1,28 +1,47 @@
 import { motion } from 'motion/react'
 import { useEffect, useRef, useState } from 'react'
+import { ChatMessage, TypingIndicator } from '../../components/ChatMessage/ChatMessage'
 import { ChoiceQuestion } from '../../components/ChoiceQuestion/ChoiceQuestion'
 import { DelayedReveal } from '../../components/DelayedReveal/DelayedReveal'
 import { SectionShell } from '../../components/SectionShell/SectionShell'
 import { caseContent, caseQuestion } from '../../content/case'
+import { clearPersistentState, usePersistentState } from '../../hooks/usePersistentState'
 import type { SectionProps } from '../../types/section'
 import { ChargeNotification } from './ChargeNotification'
-import { ChatMessage, TypingIndicator } from '../../components/ChatMessage/ChatMessage'
 
 /** Número de momentos de la secuencia antes de la pregunta. */
 const LAST_STEP = caseContent.stepButtons.length
 
+/** Prefijo de todo lo que el caso guarda en el navegador. */
+const STORAGE_PREFIX = 'masterclass:caso:'
+
 /**
  * Parte 2: el caso.
  * La historia avanza paso a paso con un único botón, para que el ponente
- * (o el visitante) controle el ritmo.
+ * (o el visitante) controle el ritmo. El avance se recuerda al cambiar de sección.
  */
 export function CaseSection({ id }: SectionProps) {
-  const [step, setStep] = useState(0)
+  const [step, setStep] = usePersistentState(`${STORAGE_PREFIX}paso`, 0)
+  const [resetVersion, setResetVersion] = useState(0)
+  // Solo bajamos solos justo después de pulsar "Investigar", no al volver a la sección.
+  const shouldScrollRef = useRef(false)
   const questionRef = useRef<HTMLDivElement>(null)
 
-  // Al llegar a la pregunta, la página baja sola hasta ella.
+  const advance = () => {
+    if (step + 1 >= LAST_STEP) shouldScrollRef.current = true
+    setStep(step + 1)
+  }
+
+  const reset = () => {
+    clearPersistentState(STORAGE_PREFIX)
+    setStep(0)
+    setResetVersion((version) => version + 1)
+    window.scrollTo({ top: 0 })
+  }
+
   useEffect(() => {
-    if (step < LAST_STEP) return
+    if (step < LAST_STEP || !shouldScrollRef.current) return
+    shouldScrollRef.current = false
     const prefersReducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches
     questionRef.current?.scrollIntoView({
       behavior: prefersReducedMotion ? 'auto' : 'smooth',
@@ -55,6 +74,7 @@ export function CaseSection({ id }: SectionProps) {
             />
             {step >= 1 && (
               <DelayedReveal
+                key={resetVersion}
                 delayMs={1200}
                 placeholder={<TypingIndicator label={caseContent.typingLabel} />}
               >
@@ -87,10 +107,20 @@ export function CaseSection({ id }: SectionProps) {
           {step < LAST_STEP && (
             <button
               type="button"
-              onClick={() => setStep((current) => current + 1)}
+              onClick={advance}
               className="self-start rounded-full border-2 border-ink bg-accent px-6 py-3 font-bold shadow-[4px_4px_0_0_var(--color-ink)] transition hover:-translate-y-0.5"
             >
               {caseContent.stepButtons[step]}
+            </button>
+          )}
+
+          {step > 0 && (
+            <button
+              type="button"
+              onClick={reset}
+              className="self-start text-sm font-semibold text-ink/70 underline underline-offset-4 hover:text-ink"
+            >
+              Volver a empezar
             </button>
           )}
         </div>
@@ -104,7 +134,11 @@ export function CaseSection({ id }: SectionProps) {
           animate={{ opacity: 1, y: 0 }}
           className="mt-12 scroll-mt-24 border-t-2 border-ink/10 pt-10"
         >
-          <ChoiceQuestion question={caseQuestion} />
+          <ChoiceQuestion
+            key={resetVersion}
+            question={caseQuestion}
+            storageKey={`${STORAGE_PREFIX}pregunta`}
+          />
         </motion.div>
       )}
     </SectionShell>

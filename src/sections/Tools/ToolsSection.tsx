@@ -1,5 +1,6 @@
 import { AnimatePresence, motion } from 'motion/react'
-import { useState, type ComponentType } from 'react'
+import type { ComponentType } from 'react'
+import { usePersistentState } from '../../hooks/usePersistentState'
 import { SectionShell } from '../../components/SectionShell/SectionShell'
 import { moments, toolsContent, type MomentId } from '../../content/tools'
 import type { SectionProps } from '../../types/section'
@@ -18,7 +19,7 @@ const MOMENT_COMPONENTS: Record<MomentId, ComponentType> = {
 
 /** Parte 5: las herramientas del detective, en cuatro momentos con pestañas. */
 export function ToolsSection({ id }: SectionProps) {
-  const [activeIndex, setActiveIndex] = useState(0)
+  const [activeIndex, setActiveIndex] = usePersistentState('masterclass:herramientas:momento', 0)
   const activeMoment = moments[activeIndex]
   const nextMoment = moments[activeIndex + 1]
   const Moment = MOMENT_COMPONENTS[activeMoment.id]

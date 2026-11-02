@@ -1,4 +1,5 @@
 import { useState } from 'react'
+import { usePersistentState } from '../../hooks/usePersistentState'
 import type { Question, QuestionOption } from '../../types/question'
 import { Bita } from '../Bita/Bita'
 import type { BitaPose } from '../Bita/bitaPoses'
@@ -16,6 +17,10 @@ interface ChoiceQuestionProps {
   intro?: string
   /** Se llama una vez cuando se acierta. */
   onCorrect?: () => void
+  /** Tamaño de Bita junto a la pregunta. */
+  bitaSize?: 'sm' | 'md' | 'lg'
+  /** Si se indica, la pregunta recuerda las respuestas al cambiar de sección. */
+  storageKey?: string
 }
 
 interface BitaState {
@@ -30,12 +35,29 @@ export function ChoiceQuestion({
   question,
   intro = 'Elige una opción y te digo qué opino.',
   onCorrect,
+  bitaSize = 'md',
+  storageKey,
 }: ChoiceQuestionProps) {
   const hints = question.hints ?? []
-  const [triedIds, setTriedIds] = useState<string[]>([])
-  const [isSolved, setIsSolved] = useState(false)
-  const [hintsUsed, setHintsUsed] = useState(0)
-  const [bita, setBita] = useState<BitaState>({ pose: 'thinking', message: intro, key: 0 })
+  const [triedIds, setTriedIds] = usePersistentState<string[]>(
+    storageKey ? `${storageKey}:probadas` : null,
+    [],
+  )
+  const [hintsUsed, setHintsUsed] = usePersistentState<number>(
+    storageKey ? `${storageKey}:pistas` : null,
+    0,
+  )
+
+  // La pregunta está resuelta si entre las opciones probadas está la correcta.
+  const correctOption = question.options.find((option) => option.isCorrect)
+  const isSolved = correctOption !== undefined && triedIds.includes(correctOption.id)
+
+  // Al volver a una pregunta ya resuelta, Bita recuerda la explicación correcta.
+  const [bita, setBita] = useState<BitaState>(() =>
+    isSolved && correctOption
+      ? { pose: 'celebrating', message: correctOption.feedback, key: 0 }
+      : { pose: 'thinking', message: intro, key: 0 },
+  )
 
   const say = (pose: BitaPose, message: string) =>
     setBita((previous) => ({ pose, message, key: previous.key + 1 }))
@@ -46,7 +68,6 @@ export function ChoiceQuestion({
       previous.includes(option.id) ? previous : [...previous, option.id],
     )
     if (option.isCorrect) {
-      setIsSolved(true)
       say('celebrating', option.feedback)
       onCorrect?.()
     } else {
@@ -119,7 +140,7 @@ export function ChoiceQuestion({
         message={bita.message}
         messageKey={String(bita.key)}
         bubbleSide="top"
-        size="md"
+        size={bitaSize}
       />
     </div>
   )

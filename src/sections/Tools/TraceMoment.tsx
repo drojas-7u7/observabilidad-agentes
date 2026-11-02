@@ -22,7 +22,7 @@ export function TraceMoment() {
       <Bita pose="hint" message={traceMoment.bita} bubbleSide="right" size="sm" className="mt-6" />
 
       <div className="mt-4">
-        <TraceExplorer trace={charoTrace} />
+        <TraceExplorer trace={charoTrace} description={traceMoment.explorerDescription} />
       </div>
 
       <p className="mt-4 text-sm text-ink/70">{traceMoment.standard}</p>

@@ -1,5 +1,6 @@
 import { motion } from 'motion/react'
-import { useState, type ReactNode } from 'react'
+import type { ReactNode } from 'react'
+import { usePersistentState } from '../../hooks/usePersistentState'
 import { RealWorld } from '../../components/RealWorld/RealWorld'
 import { TraceOutline } from '../../components/TraceExplorer/TraceOutline'
 import { cluesMoment, type ClueId } from '../../content/tools'
@@ -85,7 +86,7 @@ function ClueCard({
 
 /** Momento 3: logs, métricas y trazas, con los datos de Charo. */
 export function CluesMoment() {
-  const [revealedIds, setRevealedIds] = useState<ClueId[]>([])
+  const [revealedIds, setRevealedIds] = usePersistentState<ClueId[]>('masterclass:herramientas:pistas', [])
   const allRevealed = revealedIds.length === cluesMoment.order.length
 
   const reveal = (clueId: ClueId) =>

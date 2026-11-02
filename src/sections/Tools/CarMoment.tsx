@@ -1,12 +1,12 @@
 import { motion } from 'motion/react'
-import { useState } from 'react'
+import { usePersistentState } from '../../hooks/usePersistentState'
 import { RealWorld } from '../../components/RealWorld/RealWorld'
 import { StatusBadge } from '../../components/TraceExplorer/StatusBadge'
 import { carMoment } from '../../content/tools'
 
 /** Momento 1: monitorizar frente a observar, con el ejemplo del coche. */
 export function CarMoment() {
-  const [isAtWorkshop, setIsAtWorkshop] = useState(false)
+  const [isAtWorkshop, setIsAtWorkshop] = usePersistentState('masterclass:herramientas:taller', false)
 
   return (
     <div>

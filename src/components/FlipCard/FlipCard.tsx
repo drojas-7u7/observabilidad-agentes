@@ -1,5 +1,6 @@
 import { motion } from 'motion/react'
-import { useState, type ReactNode } from 'react'
+import type { ReactNode } from 'react'
+import { usePersistentState } from '../../hooks/usePersistentState'
 
 interface FlipCardProps {
   /** Contenido de la cara delantera. */
@@ -8,6 +9,8 @@ interface FlipCardProps {
   back: ReactNode
   /** Si es true, la cara delantera se destaca en dorado. */
   highlight?: boolean
+  /** Si se indica, la tarjeta recuerda si estaba girada al cambiar de sección. */
+  storageKey?: string
   className?: string
 }
 
@@ -19,8 +22,8 @@ const FACE_BASE =
  * Las dos caras ocupan la misma celda de una cuadrícula, así la tarjeta
  * siempre mide lo que la cara más alta.
  */
-export function FlipCard({ front, back, highlight = false, className = '' }: FlipCardProps) {
-  const [isFlipped, setIsFlipped] = useState(false)
+export function FlipCard({ front, back, highlight = false, className = '', storageKey }: FlipCardProps) {
+  const [isFlipped, setIsFlipped] = usePersistentState(storageKey ?? null, false)
 
   return (
     <button

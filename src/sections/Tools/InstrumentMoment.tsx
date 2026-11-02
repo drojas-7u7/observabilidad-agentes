@@ -1,5 +1,5 @@
 import { motion } from 'motion/react'
-import { useState } from 'react'
+import { usePersistentState } from '../../hooks/usePersistentState'
 import { Bita } from '../../components/Bita/Bita'
 import { ChatMessage } from '../../components/ChatMessage/ChatMessage'
 import { RealWorld } from '../../components/RealWorld/RealWorld'
@@ -12,7 +12,7 @@ type InstrumentMode = 'off' | 'on'
 
 /** Momento 2: sin instrumentar solo hay palabras; instrumentado hay pruebas. */
 export function InstrumentMoment() {
-  const [mode, setMode] = useState<InstrumentMode>('off')
+  const [mode, setMode] = usePersistentState<InstrumentMode>('masterclass:herramientas:instrumentar', 'off')
   const isOn = mode === 'on'
 
   return (
