@@ -4,7 +4,7 @@
 
 Masterclass interactiva impartida el 5 de noviembre de 2026 en el Bootcamp de Desarrollo de IA de Somos F5. A través de un caso práctico guiado por el detective Bita, explica cómo observar, depurar y evaluar agentes de IA: logs, métricas, trazas, spans, golden sets y LLM como juez.
 
-> Web publicada: _pendiente de publicar_
+> Web publicada: https://observabilidad-agentes.drojas-7u7.workers.dev
 
 ## El caso
 
