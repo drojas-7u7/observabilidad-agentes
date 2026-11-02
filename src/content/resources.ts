@@ -7,7 +7,7 @@ export const resourcesContent = {
     title: 'Guía completa en PDF',
     text: 'Toda la explicación de la masterclass, paso a paso y con detalle, para estudiar o repasar a tu ritmo.',
     /** Cambiar a true cuando el PDF esté en la carpeta public. */
-    isAvailable: false,
+    isAvailable: true,
     href: '/guia-evaluacion-observabilidad-agentes.pdf',
     downloadLabel: 'Descargar la guía',
     pendingLabel: 'Disponible próximamente',

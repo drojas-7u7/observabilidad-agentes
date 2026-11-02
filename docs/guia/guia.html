@@ -1,0 +1,294 @@
+<!doctype html>
+<html lang="es">
+<head>
+  <meta charset="utf-8" />
+  <title>Evaluación y observabilidad de sistemas de agentes · Guía completa</title>
+  <meta name="author" content="David Rojas Cruz" />
+  <link rel="stylesheet" href="guia.css" />
+</head>
+<body>
+
+<!-- PORTADA -->
+<section class="cover">
+  <p class="label">Expediente: detectives de agentes</p>
+  <h1>Evaluación y observabilidad de sistemas de agentes</h1>
+  <p class="hook">Tu agente dice que todo ha ido bien. ¿Cómo lo sabes?</p>
+  <div class="meta">
+    <p><strong>Guía completa de la masterclass</strong></p>
+    <p>David Rojas Cruz</p>
+    <p>Impartida el 5 de noviembre de 2026 · Bootcamp de Desarrollo de IA, Somos F5</p>
+    <p>Web interactiva: observabilidad-agentes.drojas-7u7.workers.dev</p>
+  </div>
+  <p class="license">© 2026 David Rojas Cruz. Contenido bajo licencia CC BY-NC-ND 4.0: se puede compartir citando al autor, sin fines comerciales y sin modificaciones. Bita es un personaje original del autor. Las personas, empresas, aerolíneas y datos que aparecen son ficticios.</p>
+  <img src="../../src/assets/bita/bita-presentando.webp" alt="Bita, el detective suricata" />
+</section>
+
+<!-- ÍNDICE -->
+<section class="toc">
+  <h2>Índice</h2>
+  <ol>
+    <li class="part-entry">Parte I. El caso y su contexto</li>
+    <li><a href="#por-que">1. Por qué existe este tema</a></li>
+    <li><a href="#el-caso">2. El caso del vuelo de 95 €</a></li>
+    <li><a href="#historia">3. El mismo caso en cuatro épocas</a></li>
+    <li class="part-entry">Parte II. Conceptos y herramientas</li>
+    <li><a href="#conceptos">4. Conceptos clave</a></li>
+    <li><a href="#observar">5. Monitorizar frente a observar</a></li>
+    <li><a href="#pistas">6. Las tres pistas: logs, métricas y trazas</a></li>
+    <li><a href="#trazas">7. Cómo leer una traza</a></li>
+    <li class="part-entry">Parte III. Investigar y resolver</li>
+    <li><a href="#debugging">8. La investigación del caso de Catalina</a></li>
+    <li><a href="#solucion">9. Del hallazgo a la solución</a></li>
+    <li class="part-entry">Parte IV. Evaluar y mejorar</li>
+    <li><a href="#evaluacion">10. Evaluación</a></li>
+    <li><a href="#ciclo">11. El ciclo completo</a></li>
+    <li><a href="#etica">12. Riesgos y ética</a></li>
+    <li class="part-entry">Parte V. Cierre</li>
+    <li><a href="#errores">13. Errores de concepto</a></li>
+    <li><a href="#conclusiones">14. Conclusiones</a></li>
+    <li><a href="#aprender">15. Para seguir aprendiendo</a></li>
+  </ol>
+</section>
+
+<!-- PARTE I -->
+<section class="part">
+  <p class="part-title">Parte I · El caso y su contexto</p>
+
+  <h2 id="por-que"><span class="num">1.</span> Por qué existe este tema</h2>
+  <p>Hoy sabemos construir agentes de IA: programas que reciben un encargo, deciden por su cuenta qué pasos dar y usan herramientas para cumplirlo. Pero construir un agente es solo la mitad del trabajo. La otra mitad consiste en poder responder a tres preguntas:</p>
+  <ul>
+    <li>¿Qué ha hecho exactamente el agente, paso a paso?</li>
+    <li>¿Lo ha hecho bien?</li>
+    <li>Si lo ha hecho mal, ¿dónde y por qué?</li>
+  </ul>
+  <p>Sin respuesta a esas preguntas, un agente es una caja negra, y ninguna empresa puede confiar en una caja negra que toma decisiones con dinero o datos de clientes. La <strong>observabilidad</strong> responde a las preguntas sobre qué pasó y dónde falló. La <strong>evaluación</strong> responde a si estuvo bien. La trazabilidad, el logging y el debugging son las herramientas concretas para conseguirlo.</p>
+  <p class="key">Construir un agente es fácil. Saber qué está haciendo y si lo hace bien, no.</p>
+
+  <h2 id="el-caso"><span class="num">2.</span> El caso del vuelo de 95 €</h2>
+  <img class="bita-aside" src="../../src/assets/bita/bita-pensativo.webp" alt="" />
+  <p>Destino Directo es una agencia de viajes online (ficticia) que atiende a sus clientes con un agente de IA. Una clienta, Catalina, le escribe por el chat:</p>
+  <pre>Catalina: Resérvame el vuelo más barato de Madrid a Barcelona
+          para el viernes, que cueste menos de 100 euros.
+
+Agente:   ¡Listo! Te he reservado el vuelo de AeroBrisa por 85 euros.
+          Tu localizador es M3X8RT.</pre>
+  <p>Poco después, a Catalina le llega el cargo en su tarjeta: <strong>95 €</strong>. El agente dijo que todo había ido bien. Ningún programa dio error. Y, sin embargo, algo falló.</p>
+  <p>¿Cómo averiguarlo? Preguntar al propio agente no sirve: si se equivocó una vez, puede equivocarse otra al explicarlo. Revisar el código tampoco: no hay ninguna línea rota, el fallo está en una decisión. Y volver a ejecutar el encargo no garantiza repetir el fallo, porque los agentes no siempre hacen lo mismo con la misma entrada. La única vía fiable es consultar un registro de todo lo que hizo el agente, siempre que alguien lo haya preparado para registrarlo.</p>
+  <p class="key">Las palabras no son pruebas.</p>
+
+  <h2 id="historia"><span class="num">3.</span> El mismo caso en cuatro épocas</h2>
+  <p>En 1960, el ingeniero Rudolf Kálmán definió un sistema como observable cuando se puede conocer su estado interno a partir de lo que sale de él. La idea pasó después al software. Veamos cómo se habría investigado la queja de Catalina a lo largo de los años.</p>
+  <table>
+    <tr><th>Época</th><th>Cómo era la reserva</th><th>La prueba</th><th>La lección</th></tr>
+    <tr><td>Años 80 y 90</td><td>Una agencia física. La empleada apunta la reserva en una ficha de papel.</td><td>La ficha: dice 85 €; las tasas no se apuntaron.</td><td>Registrar permite reconstruir lo que pasó, pero solo sabes lo que alguien se acordó de apuntar.</td></tr>
+    <tr><td>Años 2000</td><td>Una web con un único programa que anota cada paso en un archivo.</td><td>Los logs: una línea con la reserva a 85 € y otra con el cobro de 95 €.</td><td>El registro se hace solo, y como el programa siempre hace lo mismo, el fallo se puede repetir.</td></tr>
+    <tr><td>Años 2010</td><td>Una aplicación dividida en servicios: búsqueda, reserva y cobro, cada uno con sus logs.</td><td>La traza: un identificador común une los registros de los tres servicios.</td><td>Hay que conectar los registros. Google lo describió en 2010 (Dapper) y en 2019 nació el estándar OpenTelemetry.</td></tr>
+    <tr><td>Desde 2023</td><td>Un agente de IA que decide por su cuenta: busca, elige, reserva y responde.</td><td>La traza del agente, con cada decisión y los datos que usó.</td><td>Hay que registrar decisiones, no solo acciones. Y volver a ejecutar no sirve.</td></tr>
+  </table>
+  <p class="key">El problema siempre ha sido el mismo: saber qué ha pasado. Lo que cambia es la prueba.</p>
+</section>
+
+<!-- PARTE II -->
+<section class="part">
+  <p class="part-title">Parte II · Conceptos y herramientas</p>
+
+  <h2 id="conceptos"><span class="num">4.</span> Conceptos clave</h2>
+  <ul>
+    <li><strong>Modelo de lenguaje (LLM).</strong> Un programa que, dado un texto, escribe la continuación más probable. No consulta datos ciertos: predice palabras. Es el "cerebro" del agente.</li>
+    <li><strong>Temperatura y no determinismo.</strong> La temperatura introduce algo de azar al elegir cada palabra, de modo que el mismo encargo puede producir resultados distintos. Por eso no se puede reproducir un fallo a voluntad.</li>
+    <li><strong>Tokens y coste.</strong> El modelo trabaja con trozos de texto llamados tokens, y cada token cuesta dinero y tiempo. Si un agente se atasca repitiendo pasos, el coste se dispara.</li>
+    <li><strong>Herramientas.</strong> Funciones que el agente puede pedir que se ejecuten. El modelo pide; el programa ejecuta y le devuelve el resultado. El agente de Destino Directo usa dos: <code>buscar_vuelos</code> y <code>reservar_vuelo</code>.</li>
+    <li><strong>Agente.</strong> Un modelo de lenguaje en un bucle: piensa qué hacer, actúa con una herramienta, mira el resultado y vuelve a empezar hasta terminar. Cada vuelta del bucle es una decisión.</li>
+    <li><strong>Estado.</strong> Todo lo que el agente lleva acumulado en cada momento: el encargo, los resultados de las herramientas y sus decisiones.</li>
+  </ul>
+  <p>Los agentes fallan de una forma distinta a los programas clásicos: no son deterministas, encadenan muchas decisiones (un error pequeño al principio puede estallar al final) y pueden fallar <strong>sin dar ningún error</strong>.</p>
+
+  <h2 id="observar"><span class="num">5.</span> Monitorizar frente a observar</h2>
+  <p><strong>Monitorizar</strong> es vigilar lo que ya sabes que quieres vigilar: si un servicio está activo, cuánto tarda, cuántos errores hay. <strong>Observar</strong> es poder averiguar lo que no habías previsto: por qué una conversación costó el triple, o por qué el agente repitió la misma búsqueda siete veces.</p>
+  <div class="box">
+    <h3>El ejemplo del coche</h3>
+    <p>El testigo del salpicadero se enciende y avisa de que algo va mal, pero no dice qué. El mecánico conecta un aparato de diagnóstico y lee lo que el coche fue registrando durante el viaje: la temperatura subió, el ventilador dejó de responder y el motor entró en modo de protección. Con esos datos encuentra la causa. Y solo puede hacerlo porque el coche estaba preparado para registrar esos datos.</p>
+    <ul>
+      <li>El testigo del salpicadero equivale a las <strong>métricas y alertas</strong>.</li>
+      <li>Los datos que registra el coche equivalen a las <strong>trazas y los logs</strong>.</li>
+      <li>El mecánico con su aparato eres tú haciendo <strong>debugging</strong>.</li>
+      <li>Preparar el coche para registrar es <strong>instrumentar</strong> el agente.</li>
+    </ul>
+  </div>
+  <p>Un sistema no es observable por sí solo: hay que <strong>instrumentarlo</strong>, es decir, prepararlo para que registre lo que hace. En la práctica suele ser poco código: en un agente hecho con LangGraph basta con configurar unas variables de entorno para registrar todo en LangSmith, y con OpenTelemetry se añade una librería.</p>
+
+  <h2 id="pistas"><span class="num">6.</span> Las tres pistas: logs, métricas y trazas</h2>
+  <p>Para estudiarlas usamos a <strong>Charo</strong>, otra clienta que esa misma semana pidió un vuelo de Madrid a Sevilla, por menos de 90 €, al mismo agente que atendió a Catalina. A ella todo le salió bien: el agente le reservó AeroBrisa por 79 € (69 € más 10 € de tasas). Con un caso que funcionó aprendemos qué es lo normal.</p>
+  <h3>Logs: ¿qué pasó en cada momento?</h3>
+  <p>Anotaciones de algo que pasó en un momento concreto. En agentes se escriben estructuradas, con campos que se pueden filtrar:</p>
+  <pre>+50 ms  INFO  chat modelo-demo-1           estado=ok
++1,3 s  INFO  execute_tool buscar_vuelos   estado=ok
++2,1 s  INFO  chat modelo-demo-1           estado=ok
++3 s    INFO  execute_tool reservar_vuelo  estado=ok
++3,6 s  INFO  chat modelo-demo-1           estado=ok</pre>
+  <h3>Métricas: ¿cuánto tardó, cuánto costó?</h3>
+  <p>Números medidos a lo largo del tiempo. En la reserva de Charo: 4,1 segundos, 3165 tokens, 0,0036 € (con precios simulados), 5 pasos y 0 errores. Las métricas avisan de que algo va mal, pero no dicen por qué.</p>
+  <h3>Trazas: ¿qué provocó qué?</h3>
+  <p>El recorrido completo de una tarea, en orden y con su relación de causa y efecto. Es la pista más importante para investigar agentes.</p>
+  <p class="key">Los logs son frases sueltas en un cuaderno; la traza es el capítulo completo.</p>
+
+  <h2 id="trazas"><span class="num">7.</span> Cómo leer una traza</h2>
+  <p>Una traza es un árbol de <strong>spans</strong>. Un span es un tramo de trabajo con nombre, duración, estado y los datos que recibió y devolvió. Hay tres tipos: el <strong>agente</strong> (la tarea entera, que es la raíz del árbol), el <strong>modelo</strong> (cada decisión) y la <strong>herramienta</strong> (cada acción). Cada paso cuelga del que lo provocó, y cada uno tiene un estado técnico: correcto, aviso o error.</p>
+  <pre>Agente       Atiende el encargo de Charo                  4,1 s
+├─ Modelo       Decide buscar vuelos                      1,2 s
+├─ Herramienta  Busca los vuelos disponibles               780 ms
+├─ Modelo       Elige el más barato y decide reservarlo    980 ms
+├─ Herramienta  Reserva el vuelo                           560 ms
+└─ Modelo       Escribe la respuesta final                 420 ms</pre>
+  <p>Dentro de cada span están los datos. Por ejemplo, lo que devolvió la reserva de Charo:</p>
+  <pre>{ "estado": "confirmada", "localizador": "K7Q2PZ", "codigo_vuelo": "AB0412",
+  "precio_final": 79, "tasas": 10 }</pre>
+  <p>Los nombres técnicos de los atributos, como <code>gen_ai.request.model</code> o <code>gen_ai.usage.input_tokens</code>, siguen las convenciones de OpenTelemetry para IA generativa: un vocabulario común que entienden herramientas como LangSmith, Langfuse o Arize Phoenix, que muestran este mismo árbol para cada ejecución.</p>
+</section>
+
+<!-- PARTE III -->
+<section class="part">
+  <p class="part-title">Parte III · Investigar y resolver</p>
+
+  <h2 id="debugging"><span class="num">8.</span> La investigación del caso de Catalina</h2>
+  <p>En una empresa real, la investigación empieza con una incidencia: atención al cliente recibe la queja y la abre con prioridad alta. El equipo de IA localiza la traza de la conversación de Catalina por su localizador, M3X8RT, y la investiga en cinco pasos.</p>
+  <h3>Paso 1. Mirar las métricas</h3>
+  <table>
+    <tr><th>Métrica</th><th>Charo (salió bien)</th><th>Catalina (el caso)</th></tr>
+    <tr><td>Duración</td><td>4,1 s</td><td>4,1 s</td></tr>
+    <tr><td>Tokens</td><td>3165</td><td>3187</td></tr>
+    <tr><td>Coste</td><td>0,0036 €</td><td>0,0036 €</td></tr>
+    <tr><td>Pasos</td><td>5</td><td>5</td></tr>
+    <tr><td>Errores</td><td>0</td><td>0</td></tr>
+  </table>
+  <p>Son prácticamente iguales. Las métricas avisan de problemas grandes, pero este fallo no se ve en los números.</p>
+  <h3>Paso 2. Mirar los colores</h3>
+  <p>Todos los spans de la traza de Catalina están en verde. Y aun así pagó de más. <strong>Verde solo significa que el código no se rompió, no que el agente hiciera bien su trabajo.</strong> A esto se le llama un falso éxito.</p>
+  <h3>Paso 3. Buscar la pista</h3>
+  <p>La búsqueda devolvió tres vuelos, con un campo llamado <code>precio</code>: NubeAir 120, VuelaSol 98 y AeroBrisa 85. El precio de 95 € aparece por primera vez en lo que devolvió la reserva:</p>
+  <pre>{ "estado": "confirmada", "localizador": "M3X8RT", "codigo_vuelo": "AB0738",
+  "precio_final": 95, "tasas": 10 }</pre>
+  <h3>Paso 4. Encontrar la decisión equivocada</h3>
+  <p>El agente eligió bien el vuelo: AeroBrisa seguía siendo el más barato incluso con tasas. El problema es que la búsqueda daba precios sin tasas, y el modelo, en el último paso, tenía delante el precio final de 95 € y respondió 85. El fallo no está en una línea de código: está en una decisión.</p>
+  <h3>Paso 5. ¿De quién es la culpa?</h3>
+  <p>De los dos. La herramienta de búsqueda era ambigua (su campo <code>precio</code> no decía que era sin tasas) y el modelo no comprobó el dato que tenía delante.</p>
+  <p class="key">No siempre la culpa es solo del modelo.</p>
+
+  <h2 id="solucion"><span class="num">9.</span> Del hallazgo a la solución</h2>
+  <p>Encontrar el fallo no es el final: es el principio de la solución. Investigar una traza sirve para reparar a la clienta, medir el impacto (cuántos clientes más sufrieron lo mismo), arreglar la causa raíz y evitar que se repita. Así se gestiona profesionalmente, con un responsable en cada paso:</p>
+  <ol>
+    <li><strong>Atención al cliente</strong> recibe la queja, abre la incidencia y devuelve los 10 € a Catalina.</li>
+    <li><strong>Equipo de IA</strong> investiga la traza y encuentra la causa raíz.</li>
+    <li><strong>Equipo de IA</strong> busca en todas las trazas el mismo patrón (precio dicho distinto del cobrado) para saber a cuántos clientes afectó.</li>
+    <li><strong>Equipo de backend</strong>, responsable de la herramienta de búsqueda, cambia el campo para que devuelva siempre el precio final.</li>
+    <li><strong>Equipo de IA</strong> ajusta las instrucciones del agente para que confirme el precio con lo que devuelve la reserva.</li>
+    <li><strong>Calidad (QA)</strong> añade el caso a las pruebas automáticas y comprueba el arreglo antes de publicarlo.</li>
+    <li><strong>Todos</strong> escriben un post-mortem (qué pasó y qué se aprende, sin buscar culpables), y atención al cliente avisa a los afectados.</li>
+  </ol>
+  <p>Los dos arreglos, antes y después:</p>
+  <pre>Herramienta, antes:   { "codigo": "AB0738", "aerolinea": "AeroBrisa", "precio": 85 }
+Herramienta, después: { "codigo": "AB0738", "aerolinea": "AeroBrisa",
+                        "precio_sin_tasas": 85, "tasas": 10, "precio_final": 95 }
+
+Agente, antes:   "Cuando termines la reserva, informa al cliente
+                  del vuelo y del precio."
+Agente, después: "Cuando termines la reserva, informa al cliente
+                  del vuelo y del precio_final que devuelve reservar_vuelo.
+                  Nunca uses el precio de la búsqueda."</pre>
+  <p class="key">La traza es lo que permite a todos los equipos trabajar con datos en lugar de con opiniones.</p>
+</section>
+
+<!-- PARTE IV -->
+<section class="part">
+  <p class="part-title">Parte IV · Evaluar y mejorar</p>
+
+  <h2 id="evaluacion"><span class="num">10.</span> Evaluación</h2>
+  <p>Observar no es evaluar. La traza nos dijo qué pasó; la evaluación comprueba, cada vez que cambiamos algo, que el agente lo hace bien. Para eso se usa un <strong>golden set</strong>: un conjunto de casos de prueba preparados por personas, con la respuesta correcta conocida. El caso de Catalina pasa a formar parte de él.</p>
+  <h3>¿Quién comprueba cada cosa?</h3>
+  <table>
+    <tr><th>Qué se comprueba</th><th>Quién</th><th>Por qué</th></tr>
+    <tr><td>El precio que dice el agente coincide con el cobrado.</td><td>Código</td><td>Es una regla exacta: rápido, gratis y sin errores.</td></tr>
+    <tr><td>La respuesta es clara y amable.</td><td>LLM como juez</td><td>No hay regla exacta; otro modelo lo puntúa, pero hay que comprobar que acierta.</td></tr>
+    <tr><td>Cuál es la respuesta correcta de un caso nuevo.</td><td>Una persona</td><td>Lo más fiable y lo más caro; también sirve para comprobar al juez.</td></tr>
+  </table>
+  <p>Al ejecutar un golden set de 20 casos antes del arreglo, 17 son correctos y uno de los fallos es el de Catalina: no se puede publicar. Después del arreglo, 20 de 20: ahora sí.</p>
+  <p>Esto es la evaluación <strong>offline</strong>, antes de publicar. Con clientes reales se hace también evaluación <strong>online</strong>: se revisa automáticamente una parte de las conversaciones y se recoge la opinión de los usuarios.</p>
+
+  <h2 id="ciclo"><span class="num">11.</span> El ciclo completo</h2>
+  <ol>
+    <li><strong>Trabaja.</strong> El agente atiende a clientes reales.</li>
+    <li><strong>Registra.</strong> La observabilidad guarda cada tarea como una traza.</li>
+    <li><strong>Avisa.</strong> Las métricas y las quejas indican que algo va mal.</li>
+    <li><strong>Investiga.</strong> Con las trazas se encuentra la causa.</li>
+    <li><strong>Aprende.</strong> El fallo se convierte en un caso del golden set.</li>
+    <li><strong>Corrige.</strong> Se arregla la herramienta, el agente o los dos.</li>
+    <li><strong>Evalúa.</strong> Se ejecuta el golden set antes de publicar.</li>
+    <li><strong>Publica.</strong> Se publica el cambio, y vuelta a empezar.</li>
+  </ol>
+  <p class="key">No puedes evaluar lo que no observas, y observar sin evaluar solo te da datos sin criterio.</p>
+
+  <h2 id="etica"><span class="num">12.</span> Riesgos y ética</h2>
+  <p>Observar un agente significa guardar lo que hacen y dicen los clientes, y eso exige responsabilidad.</p>
+  <ul>
+    <li><strong>Privacidad.</strong> Los datos personales (nombre, correo, teléfono, tarjeta) deben ocultarse antes de guardarse en una traza. El RGPD lo exige.</li>
+    <li><strong>Secretos.</strong> Nunca deben quedar claves de API ni contraseñas en una traza.</li>
+    <li><strong>Coste.</strong> Guardar y evaluar todo cuesta dinero y espacio: hay que decidir qué se guarda y durante cuánto tiempo.</li>
+    <li><strong>Falsa confianza.</strong> Spans en verde y un juez sin comprobar pueden hacer creer que todo va bien.</li>
+    <li><strong>Sesgos del juez.</strong> Un LLM juez puede preferir respuestas largas o puntuar distinto según el idioma; por eso se comprueba con personas.</li>
+  </ul>
+  <p>Las herramientas profesionales permiten ocultar o filtrar datos sensibles antes de enviarlos y definir cuánto tiempo se conservan las trazas. Conviene decidirlo desde el primer día.</p>
+</section>
+
+<!-- PARTE V -->
+<section class="part">
+  <p class="part-title">Parte V · Cierre</p>
+
+  <h2 id="errores"><span class="num">13.</span> Errores de concepto</h2>
+  <ul>
+    <li>"Observabilidad es tener un panel con gráficas." No: un panel responde preguntas preparadas; observar permite responder preguntas nuevas.</li>
+    <li>"Un log muy detallado ya es una traza." No: un log es una anotación suelta; una traza es una historia ordenada con causa y efecto.</li>
+    <li>"Si todos los spans están en verde, el agente funcionó." No: verde significa que el código no se rompió.</li>
+    <li>"Si falla, la culpa es del modelo." No siempre: puede ser una herramienta, un dato mal formado o las instrucciones.</li>
+    <li>"Evaluar es poner un LLM como juez y ya." No: un juez sin comprobar puede equivocarse sin que nadie lo note.</li>
+    <li>"La observabilidad solo sirve para arreglar fallos." No: también sirve para controlar costes, mejorar el agente, auditar decisiones y crear casos de prueba.</li>
+  </ul>
+
+  <h2 id="conclusiones"><span class="num">14.</span> Conclusiones</h2>
+  <img class="bita-aside" src="../../src/assets/bita/bita-celebrando.webp" alt="" />
+  <p>Tu agente dice que todo ha ido bien. ¿Cómo lo sabes? <strong>Con trazas, para saber qué pasó. Y con evaluación, para saber si estuvo bien.</strong></p>
+  <ol>
+    <li>Las palabras del agente no son pruebas; la traza sí.</li>
+    <li>Verde no significa correcto.</li>
+    <li>Cada fallo encontrado se convierte en una prueba para que no vuelva a pasar.</li>
+  </ol>
+
+  <h2 id="aprender"><span class="num">15.</span> Para seguir aprendiendo</h2>
+  <h3>Lecturas recomendadas (en inglés)</h3>
+  <ul>
+    <li>Anthropic, <em>Building effective agents</em>: qué es un agente y sus patrones más comunes. anthropic.com/engineering/building-effective-agents</li>
+    <li>OpenTelemetry, <em>Observability primer</em>: introducción oficial a logs, métricas, trazas y spans. opentelemetry.io/docs/concepts/observability-primer</li>
+    <li>OpenTelemetry, <em>Semantic conventions for generative AI</em>: el vocabulario común gen_ai.*. opentelemetry.io/docs/specs/semconv/gen-ai</li>
+    <li>Documentación de Langfuse: trazas y evaluaciones con ejemplos visuales. langfuse.com/docs</li>
+    <li>Hamel Husain, <em>Your AI Product Needs Evals</em>: cómo evaluar productos de IA en la práctica. hamel.dev/blog/posts/evals</li>
+    <li>Google (2010), <em>Dapper, a Large-Scale Distributed Systems Tracing Infrastructure</em>: el origen del modelo de trazas y spans.</li>
+    <li>Yao et al. (2022), <em>ReAct: Synergizing Reasoning and Acting in Language Models</em>: el patrón de razonar y actuar en bucle. arxiv.org/abs/2210.03629</li>
+  </ul>
+  <h3>Glosario</h3>
+  <dl class="glossary">
+    <dt>Agente</dt><dd>Un modelo de lenguaje en un bucle, que decide pasos y usa herramientas para cumplir un encargo.</dd>
+    <dt>Observabilidad</dt><dd>La capacidad de reconstruir lo que hizo un sistema, incluso ante preguntas no previstas.</dd>
+    <dt>Instrumentar</dt><dd>Preparar un sistema para que registre lo que hace.</dd>
+    <dt>Log</dt><dd>Una anotación de algo que pasó en un momento concreto.</dd>
+    <dt>Métrica</dt><dd>Un número medido a lo largo del tiempo: duración, tokens, coste, errores.</dd>
+    <dt>Traza</dt><dd>El recorrido completo de una tarea, con su relación de causa y efecto.</dd>
+    <dt>Span</dt><dd>Un tramo de trabajo dentro de una traza, con nombre, duración, estado y datos.</dd>
+    <dt>Golden set</dt><dd>Un conjunto de casos de prueba con la respuesta correcta conocida.</dd>
+    <dt>LLM como juez</dt><dd>Usar un modelo para puntuar lo que no se puede comprobar con una regla exacta.</dd>
+    <dt>Causa raíz</dt><dd>El origen real de un fallo, no solo su síntoma.</dd>
+    <dt>Post-mortem</dt><dd>Un informe de qué pasó en una incidencia y qué se aprende, sin buscar culpables.</dd>
+  </dl>
+  <p class="small">Guía de la masterclass «Evaluación y observabilidad de sistemas de agentes», impartida el 5 de noviembre de 2026 en el Bootcamp de Desarrollo de IA de Somos F5. © 2026 David Rojas Cruz · Licencia CC BY-NC-ND 4.0. Las trazas, clientas, aerolíneas, la agencia y los datos son ficticios, creados con fines didácticos.</p>
+</section>
+
+</body>
+</html>

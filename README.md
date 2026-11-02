@@ -51,6 +51,7 @@ Scripts disponibles:
 | `npm run build` | Comprueba los tipos y genera la versión final en `dist/` |
 | `npm run lint` | Revisa el código con ESLint |
 | `npm run preview` | Sirve en local la versión final generada |
+| `npm run guia:pdf` | Regenera la guía en PDF a partir de `docs/guia/` (requiere el entorno de conda `pdf-tools` con WeasyPrint) |
 
 ## Estructura del proyecto
 

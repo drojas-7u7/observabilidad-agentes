@@ -1,0 +1,161 @@
+/* Estilos de la guía en PDF (WeasyPrint). Mismos colores y tipografías que la web. */
+
+/* Tipografías estáticas en WOFF (WeasyPrint no admite bien las variables ni WOFF2 sin Brotli) */
+@font-face {
+  font-family: "Nunito";
+  src: url("../../node_modules/@fontsource/nunito/files/nunito-latin-400-normal.woff") format("woff");
+  font-weight: 400;
+  font-style: normal;
+}
+@font-face {
+  font-family: "Nunito";
+  src: url("../../node_modules/@fontsource/nunito/files/nunito-latin-400-italic.woff") format("woff");
+  font-weight: 400;
+  font-style: italic;
+}
+@font-face {
+  font-family: "Nunito";
+  src: url("../../node_modules/@fontsource/nunito/files/nunito-latin-700-normal.woff") format("woff");
+  font-weight: 700;
+  font-style: normal;
+}
+@font-face {
+  font-family: "Baloo 2";
+  src: url("../../node_modules/@fontsource/baloo-2/files/baloo-2-latin-700-normal.woff") format("woff");
+  font-weight: 700;
+  font-style: normal;
+}
+@font-face {
+  font-family: "JetBrains Mono";
+  src: url("../../node_modules/@fontsource/jetbrains-mono/files/jetbrains-mono-latin-400-normal.woff") format("woff");
+  font-weight: 400;
+  font-style: normal;
+}
+
+@page {
+  size: A4;
+  margin: 2.2cm 2cm 2.4cm;
+  @bottom-left {
+    content: "Evaluación y observabilidad de sistemas de agentes";
+    font-family: "Nunito", "DejaVu Sans", sans-serif;
+    font-size: 8pt;
+    color: #6b7280;
+  }
+  @bottom-right {
+    content: counter(page) " / " counter(pages);
+    font-family: "Nunito", "DejaVu Sans", sans-serif;
+    font-size: 8pt;
+    color: #6b7280;
+  }
+}
+
+@page :first {
+  margin: 0;
+  @bottom-left { content: none; }
+  @bottom-right { content: none; }
+}
+
+* { box-sizing: border-box; }
+
+body {
+  font-family: "Nunito", "DejaVu Sans", sans-serif;
+  font-size: 10.5pt;
+  line-height: 1.55;
+  color: #1e2a4a;
+}
+
+h1, h2, h3 {
+  font-family: "Baloo 2", "DejaVu Sans", sans-serif;
+  font-weight: 700;
+  line-height: 1.15;
+  break-after: avoid;
+}
+h2 { font-size: 21pt; margin: 1.2em 0 0.4em; }
+h2 .num { color: #2e5aa8; }
+h3 { font-size: 14pt; margin: 1em 0 0.3em; }
+p { margin: 0 0 0.6em; }
+ul, ol { margin: 0 0 0.7em 1.2em; padding: 0; }
+li { margin-bottom: 0.25em; }
+a { color: #2e5aa8; text-decoration: none; }
+strong { font-weight: 700; }
+
+/* Portada: mide exactamente un A4, con el relleno incluido */
+.cover {
+  height: 297mm;
+  background: #fff8ec;
+  padding: 3cm 2.2cm;
+  position: relative;
+}
+.cover .label {
+  font-family: "JetBrains Mono", "DejaVu Sans Mono", monospace;
+  font-size: 10pt;
+  letter-spacing: 0.15em;
+  text-transform: uppercase;
+  color: #2e5aa8;
+}
+.cover h1 { font-size: 40pt; margin: 0.3em 0 0.4em; max-width: 13cm; }
+.cover .hook { font-size: 16pt; font-weight: 700; max-width: 12cm; }
+.cover .meta { margin-top: 1.5cm; font-size: 10.5pt; }
+.cover .meta p { margin: 0 0 0.2em; }
+.cover .license { position: absolute; bottom: 2cm; left: 2.2cm; font-size: 8pt; color: #6b7280; max-width: 8.5cm; }
+.cover img { position: absolute; right: 1.6cm; bottom: 2cm; height: 10cm; }
+
+/* Índice */
+.toc { break-before: page; }
+.toc ol { list-style: none; margin: 0; }
+.toc li { margin: 0.35em 0; }
+.toc .part-entry { font-weight: 700; margin-top: 0.9em; color: #2e5aa8; }
+.toc a { color: #1e2a4a; }
+.toc a::after { content: leader(".") target-counter(attr(href), page); }
+
+/* Partes */
+.part { break-before: page; }
+.part-title {
+  font-family: "JetBrains Mono", "DejaVu Sans Mono", monospace;
+  font-size: 9pt;
+  letter-spacing: 0.15em;
+  text-transform: uppercase;
+  color: #2e5aa8;
+  border-bottom: 1.5pt solid #d9a53b;
+  padding-bottom: 0.3em;
+}
+
+/* Bloques */
+.key {
+  border-left: 4pt solid #d9a53b;
+  background: #fff8ec;
+  padding: 0.5em 0.8em;
+  margin: 0.8em 0;
+  font-weight: 700;
+  break-inside: avoid;
+}
+.box {
+  border: 1.5pt solid #1e2a4a;
+  border-radius: 8pt;
+  padding: 0.7em 0.9em;
+  margin: 0.8em 0;
+  break-inside: avoid;
+}
+.box h3 { margin-top: 0; }
+pre {
+  font-family: "JetBrains Mono", "DejaVu Sans Mono", monospace;
+  font-size: 8pt;
+  line-height: 1.45;
+  background: #1e2a4a;
+  color: #fff8ec;
+  padding: 0.7em 0.9em;
+  border-radius: 6pt;
+  white-space: pre-wrap;
+  break-inside: avoid;
+}
+code { font-family: "JetBrains Mono", "DejaVu Sans Mono", monospace; font-size: 9pt; }
+table { width: 100%; border-collapse: collapse; font-size: 9.5pt; margin: 0.6em 0 1em; break-inside: avoid; }
+th { background: #1e2a4a; color: #fff8ec; text-align: left; padding: 4pt 6pt; }
+td { border-bottom: 0.5pt solid #d1d5db; padding: 4pt 6pt; vertical-align: top; }
+.bita-aside { float: right; width: 3.4cm; margin: 0 0 0.5em 1em; }
+.small { font-size: 8.5pt; color: #6b7280; }
+.glossary dt { font-weight: 700; margin-top: 0.4em; }
+.glossary dd { margin: 0 0 0.3em 0; }
+
+/* Los recuadros respetan las imágenes flotantes: se estrechan a su lado en lugar de pasar por debajo */
+pre, .key, .box { overflow: hidden; }
